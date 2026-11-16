@@ -5,6 +5,13 @@ const startButton = document.getElementById("start");
 const pauseButton = document.getElementById("pause");
 const stopButton = document.getElementById("stop");
 const statusElement = document.getElementById("status");
+const scheduleToggle = document.getElementById("schedule-toggle");
+const schedulePanel = document.getElementById("schedule-panel");
+const scheduleEnabled = document.getElementById("schedule-enabled");
+const scheduleStart = document.getElementById("schedule-start");
+const scheduleEnd = document.getElementById("schedule-end");
+const saveSchedule = document.getElementById("save-schedule");
+const scheduleStatus = document.getElementById("schedule-status");
 
 const formatTime = (seconds) => {
   const minutes = Math.floor(seconds / 60);
@@ -17,16 +24,33 @@ const send = (type, extra = {}) => new Promise((resolve) => {
 });
 
 const render = (state) => {
-  const { reading, earnedSeconds } = state;
+  const { reading, earnedSeconds, schedule } = state;
+  const editingDuration = document.activeElement === durationInput;
+  const editingSchedule = [scheduleEnabled, scheduleStart, scheduleEnd].includes(document.activeElement);
   timerElement.textContent = formatTime(reading.remainingSeconds);
   earnedElement.textContent = formatTime(earnedSeconds);
-  durationInput.value = Math.round(reading.durationSeconds / 60);
+  if (!editingDuration) {
+    durationInput.value = Math.round(reading.durationSeconds / 60);
+  }
   startButton.hidden = reading.isRunning;
   pauseButton.hidden = !reading.isRunning;
   durationInput.disabled = reading.isRunning;
   statusElement.textContent = earnedSeconds > 0
     ? "You can watch video links until your balance runs out."
     : "YouTube video links are locked until you earn time.";
+  if (!editingSchedule) {
+    scheduleEnabled.checked = schedule.enabled;
+    scheduleStart.value = schedule.start;
+    scheduleEnd.value = schedule.end;
+  }
+  if (schedule.pending) {
+    const minutes = Math.max(1, Math.ceil((schedule.pending.applyAt - Date.now()) / 60000));
+    scheduleStatus.textContent = `Schedule change applies in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+  } else {
+    scheduleStatus.textContent = schedule.enabled
+      ? `Videos restricted from ${schedule.start} to ${schedule.end}.`
+      : "Off: videos are restricted all day.";
+  }
 };
 
 const refresh = async () => {
@@ -57,6 +81,24 @@ durationInput.addEventListener("change", async () => {
   const response = await send("set-duration", { seconds: minutes * 60 });
   if (response?.state) render(response.state);
   if (response?.error) statusElement.textContent = response.error;
+});
+
+scheduleToggle.addEventListener("click", () => {
+  schedulePanel.hidden = !schedulePanel.hidden;
+});
+
+saveSchedule.addEventListener("click", async () => {
+  const response = await send("set-schedule", {
+    enabled: scheduleEnabled.checked,
+    start: scheduleStart.value,
+    end: scheduleEnd.value
+  });
+  if (response?.state) {
+    render(response.state);
+  }
+  if (response?.error) {
+    scheduleStatus.textContent = response.error;
+  }
 });
 
 refresh();

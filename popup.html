@@ -8,9 +8,35 @@
   </head>
   <body>
     <main>
-      <p class="eyebrow">BOOKBREAKS</p>
+      <header class="topbar">
+        <p class="eyebrow">BOOKBREAKS</p>
+        <button class="clock-button" id="schedule-toggle" aria-label="Schedule" title="Schedule">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2ZM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8Zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7Z"/>
+          </svg>
+        </button>
+      </header>
       <h1>Earn your screen time.</h1>
       <p class="intro">Read first. Every minute you finish unlocks one minute of YouTube video time.</p>
+
+      <section class="schedule card" id="schedule-panel" hidden>
+        <div class="schedule-heading">
+          <div>
+            <strong>Schedule blocking</strong>
+            <span>Restrict videos during these hours.</span>
+          </div>
+          <label class="switch">
+            <input id="schedule-enabled" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="schedule-times">
+          <label>Start <input id="schedule-start" type="time" value="09:00"></label>
+          <label>End <input id="schedule-end" type="time" value="17:00"></label>
+        </div>
+        <button class="secondary" id="save-schedule">Save schedule</button>
+        <p class="schedule-status" id="schedule-status">Off: videos are restricted all day.</p>
+      </section>
 
       <section class="card">
         <div class="timer" id="timer">25:00</div>

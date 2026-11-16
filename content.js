@@ -76,8 +76,10 @@
         showBlocked();
         return;
       }
-      if (response.state.earnedSeconds <= 0) {
+      if (response.videoBlocked && response.state.earnedSeconds <= 0) {
         showBlocked();
+      } else {
+        overlay.style.display = "none";
       }
     });
   };
@@ -93,8 +95,10 @@
       return;
     }
     chrome.runtime.sendMessage({ type: "consume-watch-second" }, (response) => {
-      if (response?.earnedSeconds === 0) {
+      if (response?.videoBlocked && response.earnedSeconds === 0) {
         showBlocked();
+      } else if (response?.videoBlocked === false || response?.earnedSeconds > 0) {
+        overlay.style.display = "none";
       }
     });
   }, 1000);

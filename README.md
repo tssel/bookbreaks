@@ -12,3 +12,7 @@ A Chrome extension that makes reading time earn YouTube video time.
 
 Only URLs containing `youtube.com/watch` are blocked. YouTube home, search,
 channel pages, and other non-video links stay available.
+
+Use the clock button in the popup to turn on scheduled blocking and choose
+start/end hours. The first schedule saves immediately. Later schedule changes
+wait five minutes before taking effect.

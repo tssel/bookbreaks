@@ -5,12 +5,28 @@ const DEFAULT_STATE = {
     remainingSeconds: 1500,
     isRunning: false,
     startedAt: null
+  },
+  schedule: {
+    enabled: false,
+    configured: false,
+    start: "09:00",
+    end: "17:00",
+    pending: null
   }
 };
 
 const getState = async () => {
   const stored = await chrome.storage.local.get("state");
-  return stored.state ? normalizeState(stored.state) : DEFAULT_STATE;
+  const state = stored.state ? normalizeState(stored.state) : DEFAULT_STATE;
+  if (state.schedule.pending && Date.now() >= state.schedule.pending.applyAt) {
+    state.schedule = {
+      ...state.schedule.pending,
+      configured: true,
+      pending: null
+    };
+    await saveState(state);
+  }
+  return state;
 };
 
 const normalizeState = (state) => ({
@@ -20,8 +36,30 @@ const normalizeState = (state) => ({
     remainingSeconds: Math.max(0, Number(state.reading?.remainingSeconds) || 0),
     isRunning: Boolean(state.reading?.isRunning),
     startedAt: state.reading?.startedAt || null
+  },
+  schedule: {
+    enabled: Boolean(state.schedule?.enabled),
+    configured: Boolean(state.schedule?.configured),
+    start: validTime(state.schedule?.start) ? state.schedule.start : "09:00",
+    end: validTime(state.schedule?.end) ? state.schedule.end : "17:00",
+    pending: state.schedule?.pending || null
   }
 });
+
+const validTime = (value) => typeof value === "string" && /^\d{2}:\d{2}$/.test(value)
+  && Number(value.slice(0, 2)) < 24 && Number(value.slice(3)) < 60;
+
+const scheduleIsActive = (schedule) => {
+  if (!schedule.enabled) return true;
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+  const start = Number(schedule.start.slice(0, 2)) * 60 + Number(schedule.start.slice(3));
+  const end = Number(schedule.end.slice(0, 2)) * 60 + Number(schedule.end.slice(3));
+  if (start === end) return true;
+  return start < end ? current >= start && current < end : current >= start || current < end;
+};
+
+const videoBlocked = (state) => scheduleIsActive(state.schedule);
 
 const saveState = (state) => chrome.storage.local.set({ state });
 
@@ -89,10 +127,45 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           }
         };
         await saveState(completedState);
-        sendResponse({ state: completedState });
+        sendResponse({
+          state: completedState,
+          videoBlocked: videoBlocked(completedState)
+        });
         return;
       }
-      sendResponse({ state: { ...state, reading } });
+      const currentState = { ...state, reading };
+      sendResponse({ state: currentState, videoBlocked: videoBlocked(currentState) });
+      return;
+    }
+
+    if (message.type === "set-schedule") {
+      if (!validTime(message.start) || !validTime(message.end)) {
+        sendResponse({ error: "Choose valid start and end times." });
+        return;
+      }
+
+      const nextSchedule = {
+        enabled: Boolean(message.enabled),
+        start: message.start,
+        end: message.end
+      };
+      if (!state.schedule.configured) {
+        const nextState = {
+          ...state,
+          schedule: { ...nextSchedule, configured: true, pending: null }
+        };
+        await saveState(nextState);
+        sendResponse({ state: nextState, videoBlocked: videoBlocked(nextState) });
+        return;
+      }
+
+      const pending = { ...nextSchedule, applyAt: Date.now() + 5 * 60 * 1000 };
+      const nextState = {
+        ...state,
+        schedule: { ...state.schedule, pending }
+      };
+      await saveState(nextState);
+      sendResponse({ state: nextState, videoBlocked: videoBlocked(nextState) });
       return;
     }
 
@@ -145,13 +218,17 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
 
     if (message.type === "consume-watch-second") {
+      if (!videoBlocked(state)) {
+        sendResponse({ earnedSeconds: state.earnedSeconds, videoBlocked: false });
+        return;
+      }
       if (state.earnedSeconds <= 0) {
-        sendResponse({ earnedSeconds: 0 });
+        sendResponse({ earnedSeconds: 0, videoBlocked: true });
         return;
       }
       const earnedSeconds = Math.max(0, state.earnedSeconds - 1);
       await saveState({ ...state, earnedSeconds });
-      sendResponse({ earnedSeconds });
+      sendResponse({ earnedSeconds, videoBlocked: true });
     }
   })().catch((error) => {
     console.error("BookBreaks:", error);
