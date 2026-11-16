@@ -9,21 +9,21 @@
   <body>
     <main>
       <header class="topbar">
-        <p class="eyebrow">BOOKBREAKS</p>
+        <p class="wordmark">BookBreaks</p>
         <button class="clock-button" id="schedule-toggle" aria-label="Schedule" title="Schedule">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2ZM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8Zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7Z"/>
           </svg>
         </button>
       </header>
-      <h1>Earn your screen time.</h1>
-      <p class="intro">Read first. Every minute you finish unlocks one minute of YouTube video time.</p>
+      <h1>Read before you watch</h1>
+      <p class="intro">Complete a reading session to earn the same amount of YouTube video time.</p>
 
       <section class="schedule card" id="schedule-panel" hidden>
         <div class="schedule-heading">
           <div>
-            <strong>Schedule blocking</strong>
-            <span>Restrict videos during these hours.</span>
+            <strong>Scheduled blocking</strong>
+            <span>Choose when video pages stay restricted.</span>
           </div>
           <label class="switch">
             <input id="schedule-enabled" type="checkbox">
@@ -40,15 +40,15 @@
 
       <section class="card">
         <div class="timer" id="timer">25:00</div>
-        <label for="duration">Session length</label>
+        <label for="duration">Reading session</label>
         <div class="duration-row">
           <input id="duration" type="number" min="1" max="120" value="25">
           <span>minutes</span>
         </div>
         <div class="actions">
-          <button class="primary" id="start">Start reading</button>
+          <button class="primary" id="start">Start session</button>
           <button class="secondary" id="pause" hidden>Pause</button>
-          <button class="secondary" id="stop">Stop and earn time</button>
+          <button class="secondary utility" id="stop">Finish and add time</button>
         </div>
       </section>
 
@@ -56,7 +56,7 @@
         <span>Available video time</span>
         <strong id="earned">0:00</strong>
       </section>
-      <p class="status" id="status">YouTube video links are locked until you earn time.</p>
+      <p class="status" id="status">Video pages stay restricted until you earn time.</p>
     </main>
     <script src="popup.js"></script>
   </body>

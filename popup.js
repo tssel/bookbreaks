@@ -36,8 +36,8 @@ const render = (state) => {
   pauseButton.hidden = !reading.isRunning;
   durationInput.disabled = reading.isRunning;
   statusElement.textContent = earnedSeconds > 0
-    ? "You can watch video links until your balance runs out."
-    : "YouTube video links are locked until you earn time.";
+    ? "Your earned time is ready for video pages."
+    : "Video pages stay restricted until you earn time.";
   if (!editingSchedule) {
     scheduleEnabled.checked = schedule.enabled;
     scheduleStart.value = schedule.start;
