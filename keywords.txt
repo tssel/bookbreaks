@@ -16,4 +16,4 @@ step by step
 training
 study
 research
-documentation
+documentation.

@@ -7,11 +7,11 @@
   overlay.id = "read-before-youtube-overlay";
   overlay.innerHTML = `
     <div class="read-before-youtube-card">
-      <div class="read-before-youtube-mark">READ FIRST</div>
-      <h1 id="read-before-youtube-heading">Reading time required</h1>
-      <p id="read-before-youtube-message">Finish a reading session in the extension popup to unlock this video.</p>
+      <div class="read-before-youtube-mark">BOOKBREAKS</div>
+      <h1 id="read-before-youtube-heading">Read before this video</h1>
+      <p id="read-before-youtube-message">Complete a reading session in the BookBreaks popup to watch this video.</p>
       <button id="read-before-youtube-allow" hidden>Allow this video</button>
-      <button id="read-before-youtube-close">Go back</button>
+      <button id="read-before-youtube-close">Return to YouTube</button>
     </div>
   `;
 
@@ -19,65 +19,84 @@
   style.textContent = `
     #read-before-youtube-overlay {
       align-items: center;
-      background: rgba(15, 23, 42, .94);
-      color: #f8fafc;
+      background: rgba(11, 13, 20, .96);
+      color: #eef0f5;
       display: none;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       inset: 0;
       justify-content: center;
       position: fixed;
       z-index: 2147483647;
     }
     .read-before-youtube-card {
-      background: #1e293b;
-      border: 1px solid #475569;
-      border-radius: 18px;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, .35);
-      max-width: 380px;
+      background: #11141c;
+      border: 1px solid rgba(238, 240, 245, .12);
+      border-left: 3px solid #c8955a;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+      max-width: 384px;
       padding: 32px;
       text-align: center;
     }
     .read-before-youtube-mark {
-      color: #93c5fd;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .14em;
+      color: #c8955a;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
     }
     .read-before-youtube-card h1 {
-      font-size: 28px;
-      margin: 12px 0;
+      color: #f3eadc;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      margin: 12px 0 8px;
     }
     .read-before-youtube-card p {
-      color: #cbd5e1;
+      color: #a3a9b8;
+      font-size: 14px;
       line-height: 1.5;
+      margin: 0;
     }
     #read-before-youtube-close {
-      background: #93c5fd;
-      border: 0;
-      border-radius: 10px;
-      color: #172033;
+      background: #1a1e28;
+      border: 1px solid rgba(238, 240, 245, .12);
+      border-radius: 8px;
+      color: #d7dbe4;
       cursor: pointer;
       font-weight: 700;
       margin-top: 12px;
       padding: 11px 18px;
     }
     #read-before-youtube-allow {
-      background: #93c5fd;
+      background: #f3eadc;
       border: 0;
-      border-radius: 10px;
-      color: #172033;
+      border-radius: 8px;
+      color: #17191f;
       cursor: pointer;
       font-weight: 700;
       margin: 12px 8px 0 0;
       padding: 11px 18px;
     }
+    #read-before-youtube-allow:hover {
+      background: #fff7eb;
+    }
+    #read-before-youtube-close:hover {
+      background: #232936;
+    }
+    #read-before-youtube-allow:focus-visible,
+    #read-before-youtube-close:focus-visible {
+      outline: 2px solid #c8955a;
+      outline-offset: 2px;
+    }
   `;
   document.documentElement.append(style, overlay);
 
   const showBlocked = () => {
-    document.getElementById("read-before-youtube-heading").textContent = "Reading time required";
+    document.getElementById("read-before-youtube-heading").textContent = "Read before this video";
     document.getElementById("read-before-youtube-message").textContent =
-      "Finish a reading session in the extension popup to unlock this video.";
+      "Complete a reading session in the BookBreaks popup to watch this video.";
     document.getElementById("read-before-youtube-allow").hidden = true;
     overlay.style.display = "flex";
   };
@@ -101,9 +120,9 @@
       return;
     }
     if (keywordExempt) {
-      document.getElementById("read-before-youtube-heading").textContent = "Educational video detected";
+      document.getElementById("read-before-youtube-heading").textContent = "Possible study video";
       document.getElementById("read-before-youtube-message").textContent =
-        "This title matches your keyword list. Do you want to allow this video?";
+        "This title matches your keyword list. Allow this video without using earned time?";
       document.getElementById("read-before-youtube-allow").hidden = false;
       overlay.style.display = "flex";
       return;

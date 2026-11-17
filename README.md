@@ -14,8 +14,7 @@ Only URLs containing `youtube.com/watch` are blocked. YouTube home, search,
 channel pages, and other non-video links stay available.
 
 Use the clock button in the popup to turn on scheduled blocking and choose
-start/end hours. The first schedule saves immediately. Later schedule changes
-wait five minutes before taking effect.
+start/end hours. Schedule changes take effect immediately.
 
 Edit `keywords.txt` to add one keyword per line. A video whose title contains
 one of those keywords asks for manual approval. Approved keyword-matching

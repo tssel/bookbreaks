@@ -18,7 +18,7 @@ const DEFAULT_STATE = {
 const getState = async () => {
   const stored = await chrome.storage.local.get("state");
   const state = stored.state ? normalizeState(stored.state) : DEFAULT_STATE;
-  if (state.schedule.pending && Date.now() >= state.schedule.pending.applyAt) {
+  if (state.schedule.pending) {
     state.schedule = {
       ...state.schedule.pending,
       configured: true,
@@ -149,20 +149,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         start: message.start,
         end: message.end
       };
-      if (!state.schedule.configured) {
-        const nextState = {
-          ...state,
-          schedule: { ...nextSchedule, configured: true, pending: null }
-        };
-        await saveState(nextState);
-        sendResponse({ state: nextState, videoBlocked: videoBlocked(nextState) });
-        return;
-      }
-
-      const pending = { ...nextSchedule, applyAt: Date.now() + 5 * 60 * 1000 };
       const nextState = {
         ...state,
-        schedule: { ...state.schedule, pending }
+        schedule: { ...nextSchedule, configured: true, pending: null }
       };
       await saveState(nextState);
       sendResponse({ state: nextState, videoBlocked: videoBlocked(nextState) });

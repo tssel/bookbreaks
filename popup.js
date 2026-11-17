@@ -43,14 +43,9 @@ const render = (state) => {
     scheduleStart.value = schedule.start;
     scheduleEnd.value = schedule.end;
   }
-  if (schedule.pending) {
-    const minutes = Math.max(1, Math.ceil((schedule.pending.applyAt - Date.now()) / 60000));
-    scheduleStatus.textContent = `Schedule change applies in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
-  } else {
-    scheduleStatus.textContent = schedule.enabled
-      ? `Videos restricted from ${schedule.start} to ${schedule.end}.`
-      : "Off: videos are restricted all day.";
-  }
+  scheduleStatus.textContent = schedule.enabled
+    ? `Videos restricted from ${schedule.start} to ${schedule.end}.`
+    : "Off: videos are restricted all day.";
 };
 
 const refresh = async () => {
